@@ -1,0 +1,1 @@
+ E:\\casa\\casa\\casa\\.dart_tool\\flutter_build\\a29f1b87d3c6fdb3818ffc488db2da47\\native_assets.yaml: 
