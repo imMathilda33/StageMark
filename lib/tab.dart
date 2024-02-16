@@ -1,5 +1,6 @@
+import 'package:casa_app/event.dart';
 import 'package:flutter/material.dart';
-import 'calendar.dart'; // 确保你有一个名为calendar.dart的文件，其中定义了Calendar这个widget
+import 'calendar.dart'; 
 
 class MyTabbedPage extends StatefulWidget {
   @override
@@ -32,7 +33,7 @@ class _MyTabbedPageState extends State<MyTabbedPage> with SingleTickerProviderSt
         controller: _tabController,
         children: [
           Calendar(), 
-          Center(child: Text('Page 2')), 
+          Event(), 
           Center(child: Text('Page 3')), 
           Center(child: Text('Page 4')), 
         ],
