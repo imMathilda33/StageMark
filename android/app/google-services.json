@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "974571383157",
+    "firebase_url": "https://casaapp-99e94-default-rtdb.firebaseio.com",
+    "project_id": "casaapp-99e94",
+    "storage_bucket": "casaapp-99e94.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:974571383157:android:6ff3ba38bc978ad6b80b3c",
+        "android_client_info": {
+          "package_name": "com.example.casa_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCzY-QAVvKSV6I9UrE-xk9el2FfOm3MDAQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'tab.dart'; 
+import 'package:firebase_database/firebase_database.dart';
+
+FirebaseDatabase database = FirebaseDatabase.instance;
 
 void main() {
   runApp(MyApp());
 }
+
 
 class MyApp extends StatelessWidget {
   @override
@@ -18,4 +22,5 @@ class MyApp extends StatelessWidget {
       home: MyTabbedPage(),
     );
   }
+  
 }
