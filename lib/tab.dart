@@ -1,6 +1,8 @@
-import 'package:casa_app/event.dart';
 import 'package:flutter/material.dart';
-import 'calendar.dart'; 
+import 'calendar.dart';
+import 'event.dart';
+import 'login.dart';
+import 'user.dart'; 
 
 class MyTabbedPage extends StatefulWidget {
   @override
@@ -9,6 +11,7 @@ class MyTabbedPage extends StatefulWidget {
 
 class _MyTabbedPageState extends State<MyTabbedPage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  bool isLoggedIn = false; 
 
   @override
   void initState() {
@@ -22,6 +25,14 @@ class _MyTabbedPageState extends State<MyTabbedPage> with SingleTickerProviderSt
     super.dispose();
   }
 
+  Widget _getTabContent() {
+    return isLoggedIn ? UserPage() : LoginRegisterPage(onLoginSuccess: () {
+      setState(() {
+        isLoggedIn = true; 
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,25 +43,25 @@ class _MyTabbedPageState extends State<MyTabbedPage> with SingleTickerProviderSt
       body: TabBarView(
         controller: _tabController,
         children: [
-          Calendar(), 
-          Event(), 
+          Calendar(),  
+          Event(),     
           Center(child: Text('Page 3')), 
-          Center(child: Text('Page 4')), 
+          _getTabContent(),  
         ],
       ),
       bottomNavigationBar: Container(
-        color: Colors.white, 
-        padding: EdgeInsets.only(bottom: 16), 
+        color: Colors.white,
+        padding: EdgeInsets.only(bottom: 16),
         child: TabBar(
           controller: _tabController,
           unselectedLabelColor: Color.fromARGB(255, 150, 150, 150),
           indicatorColor: Color.fromRGBO(247, 157, 138, 1),
           labelColor: Color.fromRGBO(247, 157, 138, 1),
           tabs: [
-            Tab(icon: Icon(Icons.calendar_month)),
-            Tab(icon: Icon(Icons.playlist_add)),
-            Tab(icon: Icon(Icons.folder_special)),
-            Tab(icon: Icon(Icons.edit_note)),
+            Tab(icon: Icon(Icons.calendar_month)),  
+            Tab(icon: Icon(Icons.playlist_add)),    
+            Tab(icon: Icon(Icons.folder_special)),  
+            Tab(icon: Icon(Icons.edit_note)),       
           ],
         ),
       ),
