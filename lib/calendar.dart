@@ -13,9 +13,9 @@ class _CustomHeaderTableCalendarState extends State<Calendar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Custom Header TableCalendar"),
-      ),
+      // appBar: AppBar(
+      //   title: Text("Custom Header TableCalendar"),
+      // ),
       body: TableCalendar(
         firstDay: DateTime.utc(2010, 10, 16),
         lastDay: DateTime.utc(2030, 3, 14),

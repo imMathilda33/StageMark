@@ -3,6 +3,8 @@ import 'calendar.dart';
 import 'event.dart';
 import 'login.dart';
 import 'user.dart'; 
+import 'package:firebase_auth/firebase_auth.dart';
+
 
 class MyTabbedPage extends StatefulWidget {
   @override
@@ -14,9 +16,16 @@ class _MyTabbedPageState extends State<MyTabbedPage> with SingleTickerProviderSt
   bool isLoggedIn = false; 
 
   @override
-  void initState() {
+   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
+
+    
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      setState(() {
+        isLoggedIn = user != null; 
+      });
+    });
   }
 
   @override
@@ -46,7 +55,7 @@ class _MyTabbedPageState extends State<MyTabbedPage> with SingleTickerProviderSt
           Calendar(),  
           Event(),     
           Center(child: Text('Page 3')), 
-          _getTabContent(),  
+          isLoggedIn ? UserPage() : LoginRegisterPage(),  
         ],
       ),
       bottomNavigationBar: Container(
