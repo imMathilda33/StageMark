@@ -31,17 +31,41 @@ class _EventState extends State<Event> {
     }
   }
 
-  Future<String?> _uploadImage(File imageFile) async {
+Future<String?> _uploadImage(File imageFile) async {
   User? currentUser = FirebaseAuth.instance.currentUser;
   if (currentUser == null) return null;
 
   String filePath = 'user_images/${currentUser.uid}/${DateTime.now().millisecondsSinceEpoch}.jpg';
   Reference storageReference = FirebaseStorage.instance.ref().child(filePath);
+  SettableMetadata metadata = SettableMetadata(contentType: "image/jpeg");
 
   try {
-    await storageReference.putFile(imageFile);
+    UploadTask uploadTask = storageReference.putFile(imageFile, metadata);
+    uploadTask.snapshotEvents.listen((TaskSnapshot taskSnapshot) {
+      switch (taskSnapshot.state) {
+        case TaskState.running:
+          final progress = 100.0 * (taskSnapshot.bytesTransferred / taskSnapshot.totalBytes);
+          print("Upload is $progress% complete.");
+          break;
+        case TaskState.paused:
+          print("Upload is paused.");
+          break;
+        case TaskState.canceled:
+          print("Upload was canceled");
+          break;
+        case TaskState.error:
+          // Handle unsuccessful uploads
+          print("Upload failed");
+          break;
+        case TaskState.success:
+          // Handle successful uploads on complete
+          print("Upload successful");
+          break;
+      }
+    });
+
+    await uploadTask;
     String downloadUrl = await storageReference.getDownloadURL();
-    print('Image uploaded: $downloadUrl');  // 添加日志来确认图片是否上传成功
     return downloadUrl;
   } catch (e) {
     print("Error uploading image: $e");
@@ -51,71 +75,77 @@ class _EventState extends State<Event> {
 
 
   void _submitData() async {
-  User? currentUser = FirebaseAuth.instance.currentUser;
+    User? currentUser = FirebaseAuth.instance.currentUser;
 
-  // 检查用户是否已登录
-  if (currentUser != null) {
-    String search = _searchController.text;
-    String name = _nameController.text;
-    String dateTime = _dateTimeController.text;
-    String seat = _seatController.text;
-    String theatre = _theatreController.text;
+    // 检查用户是否已登录
+    if (currentUser != null) {
+      String search = _searchController.text;
+      String name = _nameController.text;
+      String dateTime = _dateTimeController.text;
+      String seat = _seatController.text;
+      String theatre = _theatreController.text;
 
-    // 检查除图片外的所有字段是否已填写
-    if (search.isNotEmpty && name.isNotEmpty && dateTime.isNotEmpty && seat.isNotEmpty && theatre.isNotEmpty) {
-      String? imageUrl;
-      // 如果用户选择了图片，则上传图片并获取URL
-      if (_image != null) {
-        imageUrl = await _uploadImage(_image!);
+      // 检查除图片外的所有字段是否已填写
+      if (search.isNotEmpty &&
+          name.isNotEmpty &&
+          dateTime.isNotEmpty &&
+          seat.isNotEmpty &&
+          theatre.isNotEmpty) {
+        String? imageUrl;
+        // 如果用户选择了图片，则上传图片并获取URL
+        if (_image != null) {
+          imageUrl = await _uploadImage(_image!);
+        }
+
+        // 构建要保存的数据，包括 imageUrl（如果有的话）
+        Map<String, dynamic> eventData = {
+          'userId': currentUser.uid,
+          'search': search,
+          'name': name,
+          'dateTime': dateTime,
+          'seat': seat,
+          'theatre': theatre,
+        };
+
+        // 如果用户上传了图片，将图片URL添加到 eventData 中
+        if (imageUrl != null) {
+          eventData['imageUrl'] = imageUrl;
+        }
+
+        // 保存数据到 Realtime Database
+        DatabaseReference databaseReference = FirebaseDatabase.instance.ref();
+        await databaseReference
+            .child('users/${currentUser.uid}/events')
+            .push()
+            .set(eventData);
+
+        // 提交成功后，重置提醒状态
+        setState(() {
+          _isFieldEmpty = false;
+        });
+      } else {
+        // 如果有必填字段未填写，则显示提醒
+        setState(() {
+          _isFieldEmpty = true;
+        });
       }
-
-      // 构建要保存的数据，包括 imageUrl（如果有的话）
-      Map<String, dynamic> eventData = {
-        'userId': currentUser.uid,
-        'search': search,
-        'name': name,
-        'dateTime': dateTime,
-        'seat': seat,
-        'theatre': theatre,
-      };
-
-      // 如果用户上传了图片，将图片URL添加到 eventData 中
-      if (imageUrl != null) {
-        eventData['imageUrl'] = imageUrl;
-      }
-
-      // 保存数据到 Realtime Database
-      DatabaseReference databaseReference = FirebaseDatabase.instance.ref();
-      await databaseReference.child('users/${currentUser.uid}/events').push().set(eventData);
-
-      // 提交成功后，重置提醒状态
-      setState(() {
-        _isFieldEmpty = false;
-      });
     } else {
-      // 如果有必填字段未填写，则显示提醒
-      setState(() {
-        _isFieldEmpty = true;
-      });
+      // 如果用户未登录，显示登录提醒
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Not Logged In'),
+          content: Text('Please log in to submit data.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
     }
-  } else {
-    // 如果用户未登录，显示登录提醒
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Not Logged In'),
-        content: Text('Please log in to submit data.'),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text('OK'),
-          ),
-        ],
-      ),
-    );
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
