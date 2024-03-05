@@ -13,9 +13,6 @@ class _CustomHeaderTableCalendarState extends State<Calendar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: Text("Custom Header TableCalendar"),
-      // ),
       body: TableCalendar(
         firstDay: DateTime.utc(2010, 10, 16),
         lastDay: DateTime.utc(2030, 3, 14),
@@ -30,7 +27,7 @@ class _CustomHeaderTableCalendarState extends State<Calendar> {
         headerStyle: HeaderStyle(
           formatButtonVisible: false, // Hide format button
           titleCentered: true,
-          // Customize header's title text style as you want
+          
           titleTextStyle: TextStyle(fontSize: 20.0),
           leftChevronIcon: Icon(Icons.chevron_left, size: 30),
           rightChevronIcon: Icon(Icons.chevron_right, size: 30),

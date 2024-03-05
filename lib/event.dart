@@ -20,6 +20,7 @@ class _EventState extends State<Event> {
   bool _isFieldEmpty = false;
   File? _image;
 
+// function to pick image
   Future<void> _pickImage() async {
     final ImagePicker _picker = ImagePicker();
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
@@ -31,53 +32,54 @@ class _EventState extends State<Event> {
     }
   }
 
-Future<String?> _uploadImage(File imageFile) async {
-  User? currentUser = FirebaseAuth.instance.currentUser;
-  if (currentUser == null) return null;
+// function to upload image
+  Future<String?> _uploadImage(File imageFile) async {
+    User? currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) return null;
 
-  String filePath = 'user_images/${currentUser.uid}/${DateTime.now().millisecondsSinceEpoch}.jpg';
-  Reference storageReference = FirebaseStorage.instance.ref().child(filePath);
-  SettableMetadata metadata = SettableMetadata(contentType: "image/jpeg");
+    String filePath =
+        'user_images/${currentUser.uid}/${DateTime.now().millisecondsSinceEpoch}.jpg';
+    Reference storageReference = FirebaseStorage.instance.ref().child(filePath);
+    SettableMetadata metadata = SettableMetadata(contentType: "image/jpeg");
 
-  try {
-    UploadTask uploadTask = storageReference.putFile(imageFile, metadata);
-    uploadTask.snapshotEvents.listen((TaskSnapshot taskSnapshot) {
-      switch (taskSnapshot.state) {
-        case TaskState.running:
-          final progress = 100.0 * (taskSnapshot.bytesTransferred / taskSnapshot.totalBytes);
-          print("Upload is $progress% complete.");
-          break;
-        case TaskState.paused:
-          print("Upload is paused.");
-          break;
-        case TaskState.canceled:
-          print("Upload was canceled");
-          break;
-        case TaskState.error:
-          // Handle unsuccessful uploads
-          print("Upload failed");
-          break;
-        case TaskState.success:
-          // Handle successful uploads on complete
-          print("Upload successful");
-          break;
-      }
-    });
+    try {
+      UploadTask uploadTask = storageReference.putFile(imageFile, metadata);
+      uploadTask.snapshotEvents.listen((TaskSnapshot taskSnapshot) {
+        switch (taskSnapshot.state) {
+          case TaskState.running:
+            final progress = 100.0 *
+                (taskSnapshot.bytesTransferred / taskSnapshot.totalBytes);
+            print("Upload is $progress% complete.");
+            break;
+          case TaskState.paused:
+            print("Upload is paused.");
+            break;
+          case TaskState.canceled:
+            print("Upload was canceled");
+            break;
+          case TaskState.error:
+            // Handle unsuccessful uploads
+            print("Upload failed");
+            break;
+          case TaskState.success:
+            // Handle successful uploads on complete
+            print("Upload successful");
+            break;
+        }
+      });
 
-    await uploadTask;
-    String downloadUrl = await storageReference.getDownloadURL();
-    return downloadUrl;
-  } catch (e) {
-    print("Error uploading image: $e");
-    return null;
+      await uploadTask;
+      String downloadUrl = await storageReference.getDownloadURL();
+      return downloadUrl;
+    } catch (e) {
+      print("Error uploading image: $e");
+      return null;
+    }
   }
-}
-
 
   void _submitData() async {
     User? currentUser = FirebaseAuth.instance.currentUser;
 
-    // 检查用户是否已登录
     if (currentUser != null) {
       String search = _searchController.text;
       String name = _nameController.text;
@@ -85,19 +87,19 @@ Future<String?> _uploadImage(File imageFile) async {
       String seat = _seatController.text;
       String theatre = _theatreController.text;
 
-      // 检查除图片外的所有字段是否已填写
+      // Check that all fields are filled out except for the picture
       if (search.isNotEmpty &&
           name.isNotEmpty &&
           dateTime.isNotEmpty &&
           seat.isNotEmpty &&
           theatre.isNotEmpty) {
         String? imageUrl;
-        // 如果用户选择了图片，则上传图片并获取URL
+        // If the user selects an image, upload the image and get the URL
         if (_image != null) {
           imageUrl = await _uploadImage(_image!);
         }
 
-        // 构建要保存的数据，包括 imageUrl（如果有的话）
+        // Construct the data to be saved
         Map<String, dynamic> eventData = {
           'userId': currentUser.uid,
           'search': search,
@@ -107,30 +109,30 @@ Future<String?> _uploadImage(File imageFile) async {
           'theatre': theatre,
         };
 
-        // 如果用户上传了图片，将图片URL添加到 eventData 中
+        // If the user uploaded an image, add the image URL to eventData
         if (imageUrl != null) {
           eventData['imageUrl'] = imageUrl;
         }
 
-        // 保存数据到 Realtime Database
+        // save to Realtime Database
         DatabaseReference databaseReference = FirebaseDatabase.instance.ref();
         await databaseReference
             .child('users/${currentUser.uid}/events')
             .push()
             .set(eventData);
 
-        // 提交成功后，重置提醒状态
+        // Reset reminder status after successful submission
         setState(() {
           _isFieldEmpty = false;
         });
       } else {
-        // 如果有必填字段未填写，则显示提醒
+        // Displays a reminder if there are required fields that are not filled in
         setState(() {
           _isFieldEmpty = true;
         });
       }
     } else {
-      // 如果用户未登录，显示登录提醒
+      // Show login reminder if user is not logged in
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -222,7 +224,13 @@ Future<String?> _uploadImage(File imageFile) async {
               child: Text('Add Photo'),
             ),
             SizedBox(height: 16.0),
-            _image != null ? Image.file(_image!) : Text("No image selected"),
+            _image != null
+                ? Image.file(_image!)
+                : Center(
+                    child: Text(
+                    "No image selected",
+                    style: TextStyle(color: Color.fromARGB(255, 117, 104, 117)),
+                  )),
             SizedBox(height: 16.0),
             if (_isFieldEmpty)
               Padding(
