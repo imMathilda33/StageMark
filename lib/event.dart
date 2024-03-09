@@ -77,6 +77,44 @@ class _EventState extends State<Event> {
     }
   }
 
+  Future<void> _pickDateTime() async {
+    // 首先让用户选择日期
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2023), // 可以根据需要设置
+      lastDate: DateTime(2030),
+    );
+
+    if (pickedDate != null) {
+      // 如果用户选择了日期，再让用户选择时间
+      TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.now(),
+      );
+
+      if (pickedTime != null) {
+        // 组合日期和时间为一个DateTime对象
+        DateTime finalDateTime = DateTime(
+          pickedDate.year,
+          pickedDate.month,
+          pickedDate.day,
+          pickedTime.hour,
+          pickedTime.minute,
+        );
+
+        // 格式化日期时间为字符串
+        String formattedDateTime =
+            DateFormat('yyyy-MM-dd HH:mm:ss').format(finalDateTime);
+
+        // 更新状态以显示在UI中
+        setState(() {
+          _dateTimeController.text = formattedDateTime;
+        });
+      }
+    }
+  }
+
   void _submitData() async {
     User? currentUser = FirebaseAuth.instance.currentUser;
 
@@ -182,25 +220,11 @@ class _EventState extends State<Event> {
               controller: _dateTimeController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: 'Date & time',
-                hintText: 'Select a Date',
+                labelText: 'Date & Time',
+                hintText: 'Select Date and Time',
               ),
-              readOnly: true,
-              onTap: () async {
-                DateTime? pickedDate = await showDatePicker(
-                  context: context,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime(2010),
-                  lastDate: DateTime(2030),
-                );
-                if (pickedDate != null) {
-                  String formattedDate =
-                      DateFormat('yyyy-MM-dd').format(pickedDate);
-                  setState(() {
-                    _dateTimeController.text = formattedDate;
-                  });
-                }
-              },
+              readOnly: true, // 确保文本字段不可编辑
+              onTap: _pickDateTime, // 点击时调用 _pickDateTime 方法
             ),
             SizedBox(height: 16.0),
             TextField(
