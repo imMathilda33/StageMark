@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'eventList.dart';
+
+Map<DateTime, List<dynamic>> allEvents = {};
 
 class Calendar extends StatefulWidget {
   @override
@@ -14,11 +17,40 @@ class _CalendarState extends State<Calendar> {
   DateTime? _selectedDay;
   List<dynamic> _selectedDayEvents = [];
 
+  void _showAllEvents() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => EventsListPage(allEvents: allEvents),
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
     _selectedDay = _focusedDay;
     _fetchEventsForSelectedDay();
+    _fetchAllEvents();
+  }
+
+  void _fetchAllEvents() async {
+    User? currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      DatabaseReference ref =
+          FirebaseDatabase.instance.ref('users/${currentUser.uid}/events');
+      DatabaseEvent event = await ref.once();
+      final eventsMap = event.snapshot.value as Map<dynamic, dynamic>?;
+      if (eventsMap != null) {
+        allEvents.clear();
+        eventsMap.forEach((key, value) {
+          DateTime eventDate = DateTime.parse(value['dateTime']);
+          if (allEvents[eventDate] == null) allEvents[eventDate] = [];
+          allEvents[eventDate]!.add(value);
+        });
+        setState(() {}); // Refresh the UI
+      }
+      print(allEvents);
+    }
   }
 
 // fetch the event user has added for the specific
@@ -47,9 +79,17 @@ class _CalendarState extends State<Calendar> {
   }
 
   @override
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Calendar'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.list),
+            onPressed: _showAllEvents,
+          ),
+        ],
+      ),
       body: Column(
         children: [
           TableCalendar(
@@ -64,8 +104,37 @@ class _CalendarState extends State<Calendar> {
                 _fetchEventsForSelectedDay();
               });
             },
+            calendarBuilders: CalendarBuilders(
+              markerBuilder: (context, date, events) {
+                if (allEvents[date] != null && allEvents[date]!.isNotEmpty) {
+                  // 如果这个日期有事件，显示一个下标
+                  return Positioned(
+                    right: 1,
+                    bottom: 1,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.blue[400],
+                      ),
+                      width: 16.0,
+                      height: 16.0,
+                      child: Center(
+                        child: Text(
+                          '${allEvents[date]!.length}',
+                          style: TextStyle().copyWith(
+                            color: Colors.white,
+                            fontSize: 12.0,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }
+              },
+            ),
             headerStyle: HeaderStyle(
-              formatButtonVisible: false, 
+              formatButtonVisible: false,
               titleCentered: true,
               titleTextStyle: TextStyle(fontSize: 20.0),
               leftChevronIcon: Icon(Icons.chevron_left, size: 30),
@@ -90,34 +159,65 @@ class _CalendarState extends State<Calendar> {
             },
           ),
           Expanded(
-            // Use ListView.builder to display the events in _selectedDayEvents
             child: ListView.builder(
               itemCount: _selectedDayEvents.length,
               itemBuilder: (context, index) {
                 final event = _selectedDayEvents[index];
-                // Customize display content
-                return Container(
+                return Card(
                   margin: const EdgeInsets.symmetric(
-                      horizontal: 8.0, vertical: 4.0),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
+                      horizontal: 12.0, vertical: 6.0),
+                  elevation: 4.0,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0)),
+                  color: Color.fromRGBO(255, 218, 205, 1),// Set the card color
                   child: ListTile(
-                    title: Text(event['name'],
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Date & Time: ${event['dateTime']}'),
-                        Text('Seat: ${event['seat']}'),
-                        Text('Theatre: ${event['theatre']}'),
-                      ],
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+                    title: Text(
+                      event['name'],
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18.0,
+                        color: Colors.grey[800], 
+                      ),
+                    ),
+                    subtitle: Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Date & Time: ${event['dateTime']}',
+                            style: TextStyle(
+                                fontSize: 14.0,
+                                color: Colors.grey[800]), 
+                          ),
+                          SizedBox(height: 4.0),
+                          Text(
+                            'Seat: ${event['seat']}',
+                            style: TextStyle(
+                                fontSize: 14.0, color: Colors.grey[800]),
+                          ),
+                          SizedBox(height: 4.0),
+                          Text(
+                            'Theatre: ${event['theatre']}',
+                            style: TextStyle(
+                                fontSize: 14.0, color: Colors.grey[800]),
+                          ),
+                        ],
+                      ),
                     ),
                     trailing: event['imageUrl'] != null
-                        ? Image.network(event['imageUrl'],
-                            width: 50, height: 50, fit: BoxFit.cover)
-                        : null,
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(8.0),
+                            child: Image.network(
+                              event['imageUrl'],
+                              width: 50,
+                              height: 50,
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        : SizedBox(width: 50, height: 50),
                   ),
                 );
               },
@@ -127,4 +227,25 @@ class _CalendarState extends State<Calendar> {
       ),
     );
   }
+}
+
+Widget _buildEventsMarker(DateTime date, List events) {
+  return AnimatedContainer(
+    duration: const Duration(milliseconds: 300),
+    decoration: BoxDecoration(
+      shape: BoxShape.rectangle,
+      color: Color.fromRGBO(247, 157, 138, 1),
+    ),
+    width: 16.0,
+    height: 16.0,
+    child: Center(
+      child: Text(
+        '${events.length}',
+        style: TextStyle().copyWith(
+          color: Colors.white,
+          fontSize: 12.0,
+        ),
+      ),
+    ),
+  );
 }

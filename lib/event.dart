@@ -78,23 +78,23 @@ class _EventState extends State<Event> {
   }
 
   Future<void> _pickDateTime() async {
-    // 首先让用户选择日期
+    // First let the user choose the date
     DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime(2023), // 可以根据需要设置
+      firstDate: DateTime(2023), 
       lastDate: DateTime(2030),
     );
 
     if (pickedDate != null) {
-      // 如果用户选择了日期，再让用户选择时间
+      // If the user selects a date, then let the user select a time
       TimeOfDay? pickedTime = await showTimePicker(
         context: context,
         initialTime: TimeOfDay.now(),
       );
 
       if (pickedTime != null) {
-        // 组合日期和时间为一个DateTime对象
+       // Combine the date and time into a DateTime object.
         DateTime finalDateTime = DateTime(
           pickedDate.year,
           pickedDate.month,
@@ -103,11 +103,11 @@ class _EventState extends State<Event> {
           pickedTime.minute,
         );
 
-        // 格式化日期时间为字符串
+        // Format date and time as a string
         String formattedDateTime =
             DateFormat('yyyy-MM-dd HH:mm:ss').format(finalDateTime);
 
-        // 更新状态以显示在UI中
+       // Update the status to show in the UI
         setState(() {
           _dateTimeController.text = formattedDateTime;
         });
@@ -223,8 +223,8 @@ class _EventState extends State<Event> {
                 labelText: 'Date & Time',
                 hintText: 'Select Date and Time',
               ),
-              readOnly: true, // 确保文本字段不可编辑
-              onTap: _pickDateTime, // 点击时调用 _pickDateTime 方法
+              readOnly: true, 
+              onTap: _pickDateTime, 
             ),
             SizedBox(height: 16.0),
             TextField(
