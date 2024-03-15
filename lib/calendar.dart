@@ -3,6 +3,7 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'event_list.dart';
+import 'event_detail.dart';
 
 Map<DateTime, List<dynamic>> allEvents = {};
 
@@ -81,7 +82,7 @@ class _CalendarState extends State<Calendar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar:false,
+      extendBodyBehindAppBar: false,
       appBar: AppBar(
         title: Text('Calendar'),
         actions: [
@@ -90,7 +91,6 @@ class _CalendarState extends State<Calendar> {
             onPressed: _showAllEvents,
           ),
         ],
-       
       ),
       body: Column(
         children: [
@@ -109,7 +109,6 @@ class _CalendarState extends State<Calendar> {
             calendarBuilders: CalendarBuilders(
               markerBuilder: (context, date, events) {
                 if (allEvents[date] != null && allEvents[date]!.isNotEmpty) {
-                  // 如果这个日期有事件，显示一个下标
                   return Positioned(
                     right: 1,
                     bottom: 1,
@@ -173,6 +172,14 @@ class _CalendarState extends State<Calendar> {
                       borderRadius: BorderRadius.circular(12.0)),
                   color: Color.fromRGBO(255, 218, 205, 1), // Set the card color
                   child: ListTile(
+                    onTap: () {
+                      // Use Navigator.push to jump to the EventDetailPage and pass the clicked event.
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => EventDetailPage(event: event),
+                        ),
+                      );
+                    },
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
                     title: Text(
