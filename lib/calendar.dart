@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'eventList.dart';
+import 'event_list.dart';
 
 Map<DateTime, List<dynamic>> allEvents = {};
 
