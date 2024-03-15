@@ -81,6 +81,7 @@ class _CalendarState extends State<Calendar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar:false,
       appBar: AppBar(
         title: Text('Calendar'),
         actions: [
@@ -89,6 +90,7 @@ class _CalendarState extends State<Calendar> {
             onPressed: _showAllEvents,
           ),
         ],
+       
       ),
       body: Column(
         children: [
@@ -169,7 +171,7 @@ class _CalendarState extends State<Calendar> {
                   elevation: 4.0,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12.0)),
-                  color: Color.fromRGBO(255, 218, 205, 1),// Set the card color
+                  color: Color.fromRGBO(255, 218, 205, 1), // Set the card color
                   child: ListTile(
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
@@ -178,7 +180,7 @@ class _CalendarState extends State<Calendar> {
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18.0,
-                        color: Colors.grey[800], 
+                        color: Colors.grey[800],
                       ),
                     ),
                     subtitle: Padding(
@@ -189,8 +191,7 @@ class _CalendarState extends State<Calendar> {
                           Text(
                             'Date & Time: ${event['dateTime']}',
                             style: TextStyle(
-                                fontSize: 14.0,
-                                color: Colors.grey[800]), 
+                                fontSize: 14.0, color: Colors.grey[800]),
                           ),
                           SizedBox(height: 4.0),
                           Text(

@@ -5,7 +5,6 @@ import 'login.dart';
 import 'user.dart'; 
 import 'package:firebase_auth/firebase_auth.dart';
 
-
 class MyTabbedPage extends StatefulWidget {
   @override
   _MyTabbedPageState createState() => _MyTabbedPageState();
@@ -16,10 +15,9 @@ class _MyTabbedPageState extends State<MyTabbedPage> with SingleTickerProviderSt
   bool isLoggedIn = false; 
 
   @override
-   void initState() {
+  void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
-
     
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       setState(() {
@@ -45,18 +43,21 @@ class _MyTabbedPageState extends State<MyTabbedPage> with SingleTickerProviderSt
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          Calendar(),  
-          Event(),     
-          Center(child: Text('Page 3')), 
-          isLoggedIn ? UserPage() : LoginRegisterPage(),  
-        ],
+      body: SafeArea(
+        child: TabBarView(
+          controller: _tabController,
+          children: [
+            Calendar(),  
+            Event(),     
+            Center(child: Text('Page 3')), 
+            isLoggedIn ? UserPage() : LoginRegisterPage(),  
+          ],
+        ),
       ),
       bottomNavigationBar: Container(
         color: Colors.white,

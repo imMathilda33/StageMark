@@ -25,18 +25,5 @@ class MyApp extends StatelessWidget {
       home: MyTabbedPage(),
     );
   }
-
-  void sendData() {
-    // write data to database
-    databaseReference.child("test").set({
-      'id': '01',
-      'data': 'This is a test message'
-    }).then((_) {
-      print('Transaction  committed.');
-    }).catchError((error) {
-      print('You got an error!');
-    });
-  }
-
 }
 
