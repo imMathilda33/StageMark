@@ -3,6 +3,7 @@ import 'calendar.dart';
 import 'event.dart';
 import 'login.dart';
 import 'user.dart'; 
+import 'function.dart'; 
 import 'package:firebase_auth/firebase_auth.dart';
 
 class MyTabbedPage extends StatefulWidget {
@@ -54,7 +55,7 @@ class _MyTabbedPageState extends State<MyTabbedPage> with SingleTickerProviderSt
           children: [
             Calendar(),  
             Event(),     
-            Center(child: Text('Page 3')), 
+            FunctionPage(),
             isLoggedIn ? UserPage() : LoginRegisterPage(),  
           ],
         ),
