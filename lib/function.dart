@@ -57,21 +57,74 @@ class _FunctionPageState extends State<FunctionPage> {
 
   @override
   Widget build(BuildContext context) {
+    const int noiseThreshold = 70; // Set warning threshold for noise level to 70 dB
+
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(_isRecorderInitialized
-                ? 'Press the button to start recording'
-                : 'Requesting permissions...'),
-            if (_noiseLevel != null) Text('Noise Level: $_noiseLevel dB'),
-            ElevatedButton(
-              onPressed: _isRecorderInitialized ? _startOrStopRecording : null,
-              child: Text(_isRecording ? 'Stop Recording' : 'Start Recording'),
+      body: Column(
+        children: <Widget>[
+          Center(
+            child: Card(
+              elevation: 4.0,
+              margin: EdgeInsets.all(16),
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: Column(
+                  children: <Widget>[
+                    Text(
+                      _isRecorderInitialized
+                          ? 'Ready to detect'
+                          : 'Initializing...',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    if (_noiseLevel != null)
+                      Text(
+                        'Noise Level: $_noiseLevel dB',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: _noiseLevel! > noiseThreshold
+                              ? Colors.red
+                              : Colors.green,
+                        ),
+                      ),
+                    SizedBox(height: 10),
+                    ElevatedButton(
+                      onPressed:
+                          _isRecorderInitialized ? _startOrStopRecording : null,
+                      child: Text(
+                          _isRecording ? 'Stop Detecting' : 'Start Detecting'),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ],
-        ),
+          ),
+          if (_noiseLevel != null && _noiseLevel! > noiseThreshold)
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Card(
+                color: Colors.redAccent,
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(Icons.warning, color: Colors.white),
+                      SizedBox(width: 10),
+                      Text(
+                        'High noise level!',
+                        style: TextStyle(color: Colors.white, fontSize: 18),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
