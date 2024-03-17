@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 
@@ -57,15 +58,26 @@ class _FunctionPageState extends State<FunctionPage> {
 
   @override
   Widget build(BuildContext context) {
-    const int noiseThreshold = 70; // Set warning threshold for noise level to 70 dB
+    // Set warning threshold for noise level to 70 dB
+    const int noiseThreshold = 70;
 
     return Scaffold(
       body: Column(
         children: <Widget>[
-          Center(
+          Text(
+            'Noise Detector:',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Color.fromRGBO(144, 187, 206, 1),
+            ), // 文字样式
+          ),
+          SizedBox(
+            width: double.infinity,
             child: Card(
-              elevation: 4.0,
-              margin: EdgeInsets.all(16),
+              // elevation: 4.0,
+              margin: EdgeInsets.symmetric(horizontal: 60,vertical: 16),
               child: Padding(
                 padding: EdgeInsets.all(16),
                 child: Column(
