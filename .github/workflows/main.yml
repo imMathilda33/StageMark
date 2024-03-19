@@ -1,8 +1,4 @@
 name: Flutter Build and Upload Android APK
-description: "A new Flutter project."
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-
-version: 1.0.0
 
 on:
   push:                 # This is the condition that the action will run on
