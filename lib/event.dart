@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -7,6 +8,10 @@ import 'package:firebase_database/firebase_database.dart';
 import 'dart:io';
 
 class Event extends StatefulWidget {
+  TabController tabController;
+
+  Event({Key? key, required this.tabController}) : super(key: key);
+
   @override
   _EventState createState() => _EventState();
 }
@@ -18,7 +23,13 @@ class _EventState extends State<Event> {
   final TextEditingController _seatController = TextEditingController();
   final TextEditingController _theatreController = TextEditingController();
   bool _isFieldEmpty = false;
+  bool _isSubmitionOk = false;
   File? _image;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
 // function to pick image
   Future<void> _pickImage() async {
@@ -82,8 +93,8 @@ class _EventState extends State<Event> {
     DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime(2023), 
-      lastDate: DateTime(2030),
+      firstDate: DateTime(DateTime.now().year - 1),
+      lastDate: DateTime(DateTime.now().year + 6),
     );
 
     if (pickedDate != null) {
@@ -126,8 +137,7 @@ class _EventState extends State<Event> {
       String theatre = _theatreController.text;
 
       // Check that all fields are filled out except for the picture
-      if (search.isNotEmpty &&
-          name.isNotEmpty &&
+      if (name.isNotEmpty &&
           dateTime.isNotEmpty &&
           seat.isNotEmpty &&
           theatre.isNotEmpty) {
@@ -162,11 +172,26 @@ class _EventState extends State<Event> {
         // Reset reminder status after successful submission
         setState(() {
           _isFieldEmpty = false;
+          _isSubmitionOk = true;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Seat Information Submitted!"),
+            duration: Duration(seconds: 2),
+          ),
+        );
+        Timer(Duration(seconds: 1), () {
+          widget.tabController.animateTo(0);
+          setState(() {
+            _isFieldEmpty = false;
+            _isSubmitionOk = false;
+          });
         });
       } else {
         // Displays a reminder if there are required fields that are not filled in
         setState(() {
           _isFieldEmpty = true;
+          _isSubmitionOk = false;
         });
       }
     } else {
@@ -191,6 +216,7 @@ class _EventState extends State<Event> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: null,
         title: Text('Add to Calendar'),
       ),
       body: Padding(
@@ -253,7 +279,7 @@ class _EventState extends State<Event> {
                 : Center(
                     child: Text(
                     "No image selected",
-                    style: TextStyle(color: Color.fromARGB(255, 117, 104, 117)),
+                    style: TextStyle(color:  Color.fromARGB(255, 117, 104, 117)),
                   )),
             SizedBox(height: 16.0),
             if (_isFieldEmpty)
@@ -261,7 +287,16 @@ class _EventState extends State<Event> {
                 padding: const EdgeInsets.only(bottom: 8.0),
                 child: Text(
                   'Please fill in all fields',
-                  style: TextStyle(color: Colors.red),
+                  style: TextStyle(color:  Colors.red),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            if (_isSubmitionOk)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Text(
+                  'Submitted, Okay!',
+                  style: TextStyle(color: Colors.green),
                   textAlign: TextAlign.center,
                 ),
               ),

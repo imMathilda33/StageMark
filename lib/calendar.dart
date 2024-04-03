@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'event_list.dart';
 import 'event_detail.dart';
-import 'login.dart';
 
 Map<DateTime, List<dynamic>> allEvents = {};
 

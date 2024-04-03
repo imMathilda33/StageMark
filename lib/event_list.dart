@@ -1,25 +1,46 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; 
+import 'package:intl/intl.dart';
+import 'login.dart';
 
-class EventsListPage extends StatelessWidget {
-  final Map<DateTime, List<dynamic>> allEvents;
-
+class EventsListPage extends StatefulWidget {
+  Map<DateTime, List<dynamic>> allEvents;
   EventsListPage({Key? key, required this.allEvents}) : super(key: key);
+  @override
+  _EventsListPageState createState() => _EventsListPageState();
+}
 
+class _EventsListPageState extends State<EventsListPage> {
   bool isSameDay(DateTime date1, DateTime date2) {
     return date1.year == date2.year &&
         date1.month == date2.month &&
         date1.day == date2.day;
   }
 
+  bool isThemeToggled = false;
+
+  void fetchThemeInformation() async {
+    bool themeValue = await getInformationBool("theme");
+    setState(() {
+      isThemeToggled = themeValue;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchThemeInformation();
+  }
+
   @override
   Widget build(BuildContext context) {
     // Sort allEvents by date first.
-    var sortedEvents = allEvents.entries.toList()
+    var sortedEvents = widget.allEvents.entries.toList()
       ..sort((a, b) => a.key.compareTo(b.key));
 
     List<Widget> eventTiles = [];
     DateTime? lastAddedDate;
+
+    fetchThemeInformation();
 
     for (var entry in sortedEvents) {
      // Add a date title if the current date is different from the last date added
@@ -31,7 +52,7 @@ class EventsListPage extends StatelessWidget {
               DateFormat('yyyy-MM-dd').format(entry.key), 
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: Theme.of(context).primaryColor,
+                color: Theme.of(context).colorScheme.primary,
                 fontSize: 20,
               ),
             ),
@@ -39,6 +60,8 @@ class EventsListPage extends StatelessWidget {
         );
         lastAddedDate = entry.key; // Update the last date added
       }
+
+      fetchThemeInformation();
 
       // Then add all events under that date
       eventTiles.addAll(
@@ -49,7 +72,6 @@ class EventsListPage extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12.0),
             ),
-            color: Color.fromRGBO(255, 218, 205, 1), 
             child: ListTile(
               contentPadding:
                   EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
@@ -58,7 +80,7 @@ class EventsListPage extends StatelessWidget {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18.0,
-                  color: Colors.grey[800], 
+                  color: isThemeToggled? Theme.of(context).colorScheme.secondary : Colors.grey[800],
                 ),
               ),
               subtitle: Padding(
@@ -67,7 +89,7 @@ class EventsListPage extends StatelessWidget {
                   'Date & Time: ${event['dateTime']}',
                   style: TextStyle(
                     fontSize: 14.0,
-                    color: Colors.grey.withOpacity(0.8), 
+                    color: isThemeToggled? Theme.of(context).colorScheme.secondary : Colors.grey.withOpacity(0.8),
                   ),
                 ),
               ),
@@ -84,8 +106,11 @@ class EventsListPage extends StatelessWidget {
       );
     }
 
+    fetchThemeInformation();
+
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: isThemeToggled? Theme.of(context).colorScheme.secondaryContainer : null,
         title: Text('All Events'),
       ),
       body: ListView(
