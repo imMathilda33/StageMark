@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'login.dart';
 
 class UserPage extends StatefulWidget {
-  UserPage({Key? key}) : super(key: key);
+  TabController tabController;
+
+  UserPage({Key? key, required this.tabController}) : super(key: key);
 
   @override
   _UserPageState createState() => _UserPageState();
@@ -12,12 +15,17 @@ class _UserPageState extends State<UserPage> {
   User? user = FirebaseAuth.instance.currentUser;
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       // appBar: AppBar(
       //   title: Text("User Profile"),
       // ),
-      body: SafeArea( // 使用 SafeArea 包裹页面内容
+      body: SafeArea( 
         child: Column(
           children: <Widget>[
             SizedBox(height: 20),
@@ -28,7 +36,8 @@ class _UserPageState extends State<UserPage> {
             ),
             SizedBox(height: 10),
             Text(
-              user?.displayName ?? 'User Nickname',
+              // user?.displayName ?? 'User Nickname',
+              user?.email ?? 'User Nickname',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 20),
@@ -49,9 +58,10 @@ class _UserPageState extends State<UserPage> {
                     title: Text('Log Out'),
                     onTap: () async {
                       await FirebaseAuth.instance.signOut();
-                      // 考虑添加逻辑以将用户返回登录屏幕或通知他们已注销
+                      saveInformation("user", "");
+                      widget.tabController.animateTo(3);
                     },
-                  ),
+                  ),          
                 ],
               ),
             ),
