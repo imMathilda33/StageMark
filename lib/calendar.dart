@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'event_list.dart';
 import 'event_detail.dart';
+import 'login.dart';
 
 Map<DateTime, List<dynamic>> allEvents = {};
 
@@ -81,9 +82,13 @@ class _CalendarState extends State<Calendar> {
 
   @override
   Widget build(BuildContext context) {
+    User? currentUser = FirebaseAuth.instance.currentUser;
+
     return Scaffold(
       extendBodyBehindAppBar: false,
+      backgroundColor: null,
       appBar: AppBar(
+        backgroundColor:null,
         title: Text('Calendar'),
         actions: [
           IconButton(
@@ -95,8 +100,8 @@ class _CalendarState extends State<Calendar> {
       body: Column(
         children: [
           TableCalendar(
-            firstDay: DateTime.utc(2010, 10, 16),
-            lastDay: DateTime.utc(2030, 3, 14),
+            firstDay: DateTime.utc(DateTime.now().year - 10, 1, 1),
+            lastDay: DateTime.utc(DateTime.now().year + 10, 12, 31),
             focusedDay: _focusedDay,
             selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
             onDaySelected: (selectedDay, focusedDay) {
@@ -109,6 +114,7 @@ class _CalendarState extends State<Calendar> {
             calendarBuilders: CalendarBuilders(
               markerBuilder: (context, date, events) {
                 if (allEvents[date] != null && allEvents[date]!.isNotEmpty) {
+                  final List<Color> colors = [Colors.blue[400]!, Colors.transparent];
                   return Positioned(
                     right: 1,
                     bottom: 1,
@@ -116,7 +122,11 @@ class _CalendarState extends State<Calendar> {
                       duration: const Duration(milliseconds: 300),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.blue[400],
+                        gradient: LinearGradient(
+                          colors: colors,
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        ),
                       ),
                       width: 16.0,
                       height: 16.0,
@@ -131,7 +141,7 @@ class _CalendarState extends State<Calendar> {
                       ),
                     ),
                   );
-                }
+                };
               },
             ),
             headerStyle: HeaderStyle(
@@ -146,8 +156,8 @@ class _CalendarState extends State<Calendar> {
               showDatePicker(
                 context: context,
                 initialDate: _focusedDay,
-                firstDate: DateTime.utc(2010, 10, 16),
-                lastDate: DateTime.utc(2030, 3, 14),
+                firstDate: DateTime.utc(DateTime.now().year - 10, 1, 1),
+                lastDate: DateTime.utc(DateTime.now().year + 10, 12, 31),
               ).then((selectedDate) {
                 // Check if the date is selected
                 if (selectedDate != null) {
@@ -160,7 +170,7 @@ class _CalendarState extends State<Calendar> {
             },
           ),
           Expanded(
-            child: ListView.builder(
+            child: _selectedDayEvents.length > 0 ? ListView.builder(
               itemCount: _selectedDayEvents.length,
               itemBuilder: (context, index) {
                 final event = _selectedDayEvents[index];
@@ -170,13 +180,13 @@ class _CalendarState extends State<Calendar> {
                   elevation: 4.0,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12.0)),
-                  color: Color.fromRGBO(255, 218, 205, 1), // Set the card color
+                  color:  Color.fromRGBO(255, 218, 205, 1), // Set the card color
                   child: ListTile(
                     onTap: () {
                       // Use Navigator.push to jump to the EventDetailPage and pass the clicked event.
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => EventDetailPage(event: event),
+                          builder: (context) => EventDetailPage(selectedDayEvent: _selectedDayEvents, index: index),
                         ),
                       );
                     },
@@ -187,7 +197,7 @@ class _CalendarState extends State<Calendar> {
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18.0,
-                        color: Colors.grey[800],
+                        color:  Colors.grey[800],
                       ),
                     ),
                     subtitle: Padding(
@@ -198,19 +208,19 @@ class _CalendarState extends State<Calendar> {
                           Text(
                             'Date & Time: ${event['dateTime']}',
                             style: TextStyle(
-                                fontSize: 14.0, color: Colors.grey[800]),
+                                fontSize: 14.0, color:  Colors.grey[800]),
                           ),
                           SizedBox(height: 4.0),
                           Text(
                             'Seat: ${event['seat']}',
                             style: TextStyle(
-                                fontSize: 14.0, color: Colors.grey[800]),
+                                fontSize: 14.0, color:  Colors.grey[800]),
                           ),
                           SizedBox(height: 4.0),
                           Text(
                             'Theatre: ${event['theatre']}',
                             style: TextStyle(
-                                fontSize: 14.0, color: Colors.grey[800]),
+                                fontSize: 14.0, color:  Colors.grey[800]),
                           ),
                         ],
                       ),
@@ -229,6 +239,15 @@ class _CalendarState extends State<Calendar> {
                   ),
                 );
               },
+            ) : (currentUser != null ? Text(
+                'No Event Found,\nHave a Good Day!',
+                style: TextStyle(
+                    fontSize: 20.0, color: Colors.grey[800]),
+              ): Text(
+                'Please log in to start',
+                style: TextStyle(
+                    fontSize: 20.0, color:  Colors.grey[800]),
+              )
             ),
           ),
         ],
