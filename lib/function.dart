@@ -1,19 +1,20 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:flutter_sound/flutter_sound.dart';
+import 'package:location/location.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:http/http.dart' as http;
+import 'package:permission_handler/permission_handler.dart' as ph;
+import 'package:flutter_sound/flutter_sound.dart';
 
 class FunctionPage extends StatefulWidget {
-  FunctionPage();
-
   @override
   _FunctionPageState createState() => _FunctionPageState();
 }
 
 class _FunctionPageState extends State<FunctionPage> {
   GoogleMapController? mapController;
-  final LatLng _center = const LatLng(45.521563, -122.677433);
-
+  final Set<Marker> _markers = {};
+  LatLng _currentPosition = LatLng(51.5072, -0.1276);
   FlutterSoundRecorder? _recorder;
   bool _isRecorderInitialized = false;
   bool _isRecording = false;
@@ -23,13 +24,15 @@ class _FunctionPageState extends State<FunctionPage> {
   void initState() {
     super.initState();
     _initializeRecorder();
+    _getCurrentLocation();
+    _loadTheatreMarkers();
   }
 
   Future<void> _initializeRecorder() async {
     _recorder = FlutterSoundRecorder();
 
-    final status = await Permission.microphone.request();
-    if (status != PermissionStatus.granted) {
+    final ph.PermissionStatus status = await ph.Permission.microphone.request();
+    if (status != ph.PermissionStatus.granted) {
       setState(() => _isRecorderInitialized = false);
       return;
     }
@@ -37,6 +40,33 @@ class _FunctionPageState extends State<FunctionPage> {
     await _recorder!.openRecorder();
     _recorder!.setSubscriptionDuration(const Duration(milliseconds: 500));
     setState(() => _isRecorderInitialized = true);
+  }
+
+  Future<void> _getCurrentLocation() async {
+    Location location = new Location();
+
+    bool serviceEnabled = await location.serviceEnabled();
+    if (!serviceEnabled) {
+      serviceEnabled = await location.requestService();
+      if (!serviceEnabled) {
+        return;
+      }
+    }
+
+    PermissionStatus permissionGranted = await location.hasPermission();
+    if (permissionGranted == PermissionStatus.denied) {
+      permissionGranted = await location.requestPermission();
+      if (permissionGranted != PermissionStatus.granted) {
+        return;
+      }
+    }
+
+    LocationData currentLocation = await location.getLocation();
+
+    setState(() {
+      _currentPosition =
+          LatLng(currentLocation.latitude ?? 0, currentLocation.longitude ?? 0);
+    });
   }
 
   void _startOrStopRecording() async {
@@ -57,8 +87,89 @@ class _FunctionPageState extends State<FunctionPage> {
     }
   }
 
+  Future<void> _fetchNearbyTheaters(LatLng currentPosition) async {
+    const apiKey = 'AIzaSyAdTknHEdeDrUvMahgZawQo2JwmpafovPo';
+    final String url =
+        'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${currentPosition.latitude},${currentPosition.longitude}&radius=10000&type=theatre&key=$apiKey';
+
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      _updateMarkers(data['results']);
+    } else {
+      print('Failed to load nearby theatres. Error: ${response.body}');
+    }
+  }
+
+  void _updateMarkers(List<dynamic> theaters) {
+    setState(() {
+      _markers.clear();
+      for (var theater in theaters) {
+        final marker = Marker(
+          markerId: MarkerId(theater['place_id']),
+          position: LatLng(theater['geometry']['location']['lat'],
+              theater['geometry']['location']['lng']),
+          infoWindow: InfoWindow(
+            title: theater['name'],
+            snippet: theater['vicinity'],
+          ),
+        );
+        _markers.add(marker);
+      }
+    });
+  }
+
+  void _loadTheatreMarkers() {
+    setState(() {
+      _markers.addAll([
+        Marker(
+          markerId: MarkerId("shakespeares_globe"),
+          position: LatLng(51.508076, -0.097177),
+          infoWindow: InfoWindow(title: "Shakespeare's Globe"),
+        ),
+        Marker(
+          markerId: MarkerId("national_theatre"),
+          position: LatLng(51.507408, -0.115629),
+          infoWindow: InfoWindow(title: "National Theatre"),
+        ),
+        Marker(
+          markerId: MarkerId("royal_opera_house"),
+          position: LatLng(51.513053, -0.127371),
+          infoWindow: InfoWindow(title: "Royal Opera House"),
+        ),
+        Marker(
+          markerId: MarkerId("lyceum_theatre"),
+          position: LatLng(51.511586, -0.119508), 
+          infoWindow: InfoWindow(title: "Lyceum Theatre"),
+        ),
+        Marker(
+          markerId: MarkerId("garrick_theatre"),
+          position: LatLng(51.510145, -0.127708), 
+          infoWindow: InfoWindow(title: "Garrick Theatre"),
+        ),
+        Marker(
+          markerId: MarkerId("duchess_theatre"),
+          position: LatLng(51.512206, -0.119390), 
+          infoWindow: InfoWindow(title: "Duchess Theatre"),
+        ),
+        Marker(
+          markerId: MarkerId("prince_of_wales_theatre"),
+          position: LatLng(51.510067, -0.132714), 
+          infoWindow: InfoWindow(title: "Prince of Wales Theatre"),
+        ),
+        Marker(
+          markerId: MarkerId("savoy_theatre"),
+          position: LatLng(51.510372, -0.120919), 
+          infoWindow: InfoWindow(title: "Savoy Theatre"),
+        ),
+        
+      ]);
+    });
+  }
+
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
+    _getCurrentLocation();
   }
 
   @override
@@ -92,7 +203,9 @@ class _FunctionPageState extends State<FunctionPage> {
                   child: Column(
                     children: <Widget>[
                       Text(
-                        _isRecorderInitialized ? 'Ready to detect' : 'Initializing...',
+                        _isRecorderInitialized
+                            ? 'Ready to detect'
+                            : 'Initializing...',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -105,13 +218,19 @@ class _FunctionPageState extends State<FunctionPage> {
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: _noiseLevel! > noiseThreshold ? Colors.red : Colors.green,
+                            color: _noiseLevel! > noiseThreshold
+                                ? Colors.red
+                                : Colors.green,
                           ),
                         ),
                       SizedBox(height: 10),
                       ElevatedButton(
-                        onPressed: _isRecorderInitialized ? _startOrStopRecording : null,
-                        child: Text(_isRecording ? 'Stop Detecting' : 'Start Detecting'),
+                        onPressed: _isRecorderInitialized
+                            ? _startOrStopRecording
+                            : null,
+                        child: Text(_isRecording
+                            ? 'Stop Detecting'
+                            : 'Start Detecting'),
                       ),
                     ],
                   ),
@@ -150,9 +269,10 @@ class _FunctionPageState extends State<FunctionPage> {
                   child: GoogleMap(
                     onMapCreated: _onMapCreated,
                     initialCameraPosition: CameraPosition(
-                      target: _center,
-                      zoom: 11.0,
+                      target: _currentPosition,
+                      zoom: 12.0,
                     ),
+                    markers: _markers,
                   ),
                 ),
               ),
