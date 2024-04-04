@@ -59,173 +59,6 @@ class _FunctionPageState extends State<FunctionPage> {
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
-    if(Brightness.dark == MediaQuery.of(context).platformBrightness){
-      mapController?.setMapStyle('''
-            [
-        {
-          "elementType": "geometry",
-          "stylers": [
-            {
-              "color": "#242f3e"
-            }
-          ]
-        },
-        {
-          "elementType": "labels.text.fill",
-          "stylers": [
-            {
-              "color": "#746855"
-            }
-          ]
-        },
-        {
-          "elementType": "labels.text.stroke",
-          "stylers": [
-            {
-              "color": "#242f3e"
-            }
-          ]
-        },
-        {
-          "featureType": "administrative.locality",
-          "elementType": "labels.text.fill",
-          "stylers": [
-            {
-              "color": "#d59563"
-            }
-          ]
-        },
-        {
-          "featureType": "poi",
-          "elementType": "labels.text.fill",
-          "stylers": [
-            {
-              "color": "#d59563"
-            }
-          ]
-        },
-        {
-          "featureType": "poi.park",
-          "elementType": "geometry",
-          "stylers": [
-            {
-              "color": "#263c3f"
-            }
-          ]
-        },
-        {
-          "featureType": "poi.park",
-          "elementType": "labels.text.fill",
-          "stylers": [
-            {
-              "color": "#6b9a76"
-            }
-          ]
-        },
-        {
-          "featureType": "road",
-          "elementType": "geometry",
-          "stylers": [
-            {
-              "color": "#38414e"
-            }
-          ]
-        },
-        {
-          "featureType": "road",
-          "elementType": "geometry.stroke",
-          "stylers": [
-            {
-              "color": "#212a37"
-            }
-          ]
-        },
-        {
-          "featureType": "road",
-          "elementType": "labels.text.fill",
-          "stylers": [
-            {
-              "color": "#9ca5b3"
-            }
-          ]
-        },
-        {
-          "featureType": "road.highway",
-          "elementType": "geometry",
-          "stylers": [
-            {
-              "color": "#746855"
-            }
-          ]
-        },
-        {
-          "featureType": "road.highway",
-          "elementType": "geometry.stroke",
-          "stylers": [
-            {
-              "color": "#1f2835"
-            }
-          ]
-        },
-        {
-          "featureType": "road.highway",
-          "elementType": "labels.text.fill",
-          "stylers": [
-            {
-              "color": "#f3d19c"
-            }
-          ]
-        },
-        {
-          "featureType": "transit",
-          "elementType": "geometry",
-          "stylers": [
-            {
-              "color": "#2f3948"
-            }
-          ]
-        },
-        {
-          "featureType": "transit.station",
-          "elementType": "labels.text.fill",
-          "stylers": [
-            {
-              "color": "#d59563"
-            }
-          ]
-        },
-        {
-          "featureType": "water",
-          "elementType": "geometry",
-          "stylers": [
-            {
-              "color": "#17263c"
-            }
-          ]
-        },
-        {
-          "featureType": "water",
-          "elementType": "labels.text.fill",
-          "stylers": [
-            {
-              "color": "#515c6d"
-            }
-          ]
-        },
-        {
-          "featureType": "water",
-          "elementType": "labels.text.stroke",
-          "stylers": [
-            {
-              "color": "#17263c"
-            }
-          ]
-        }
-      ]
-      ''');
-    }else{
-      mapController?.setMapStyle('''[]''');
-    }
   }
 
   @override
@@ -238,7 +71,7 @@ class _FunctionPageState extends State<FunctionPage> {
         child: Column(
           children: <Widget>[
             Container(
-              color:  Colors.transparent,
+              color: Colors.transparent,
               height: 30,
             ),
             Text(
@@ -247,7 +80,7 @@ class _FunctionPageState extends State<FunctionPage> {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color:  Color.fromRGBO(144, 187, 206, 1),
+                color: Color.fromRGBO(144, 187, 206, 1),
               ),
             ),
             SizedBox(
@@ -272,7 +105,7 @@ class _FunctionPageState extends State<FunctionPage> {
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: _noiseLevel! > noiseThreshold ? ( Colors.red) : (Colors.green),
+                            color: _noiseLevel! > noiseThreshold ? Colors.red : Colors.green,
                           ),
                         ),
                       SizedBox(height: 10),
@@ -295,11 +128,11 @@ class _FunctionPageState extends State<FunctionPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        Icon(Icons.warning, color:  Colors.white),
+                        Icon(Icons.warning, color: Colors.white),
                         SizedBox(width: 10),
                         Text(
                           'High noise level!',
-                          style: TextStyle(color:  Colors.white, fontSize: 18),
+                          style: TextStyle(color: Colors.white, fontSize: 18),
                         ),
                       ],
                     ),
@@ -308,7 +141,7 @@ class _FunctionPageState extends State<FunctionPage> {
               ),
             SizedBox(height: 20),
             Container(
-              height: 400, 
+              height: 400,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(10.0),
                 child: SizedBox(
