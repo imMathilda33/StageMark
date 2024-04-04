@@ -17,7 +17,7 @@ StageMark is a Flutter-based application crafted for theater lovers. StageMark i
 - **Streamlined Interface:** Navigate through a modern and user-friendly interface designed for efficiency and elegance.
 - **Simplified Event Management:** Modify, remove, or reschedule your planned events with ease.
 
-## Getting Started
+<!-- ## Getting Started
 
 Dive into the StageMark experience by cloning this repository and setting up your Flutter environment. Follow these straightforward steps:
 
@@ -72,4 +72,4 @@ Include a section that gives intructions on how to install the app or run it in 
 
 ##  Contact Details
 
-Having Contact Details is also good as it shows people how to get in contact with you if they'd like to contribute to the app.  -->
+Having Contact Details is also good as it shows people how to get in contact with you if they'd like to contribute to the app.  --> -->
