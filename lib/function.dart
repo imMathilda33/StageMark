@@ -5,6 +5,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart' as ph;
 import 'package:flutter_sound/flutter_sound.dart';
+import 'markers.dart';
 
 class FunctionPage extends StatefulWidget {
   @override
@@ -25,7 +26,7 @@ class _FunctionPageState extends State<FunctionPage> {
     super.initState();
     _initializeRecorder();
     _getCurrentLocation();
-    _loadTheatreMarkers();
+    _markers.addAll(loadTheatreMarkers());
   }
 
   Future<void> _initializeRecorder() async {
@@ -119,53 +120,12 @@ class _FunctionPageState extends State<FunctionPage> {
     });
   }
 
-  void _loadTheatreMarkers() {
-    setState(() {
-      _markers.addAll([
-        Marker(
-          markerId: MarkerId("shakespeares_globe"),
-          position: LatLng(51.508076, -0.097177),
-          infoWindow: InfoWindow(title: "Shakespeare's Globe"),
-        ),
-        Marker(
-          markerId: MarkerId("national_theatre"),
-          position: LatLng(51.507408, -0.115629),
-          infoWindow: InfoWindow(title: "National Theatre"),
-        ),
-        Marker(
-          markerId: MarkerId("royal_opera_house"),
-          position: LatLng(51.513053, -0.127371),
-          infoWindow: InfoWindow(title: "Royal Opera House"),
-        ),
-        Marker(
-          markerId: MarkerId("lyceum_theatre"),
-          position: LatLng(51.511586, -0.119508), 
-          infoWindow: InfoWindow(title: "Lyceum Theatre"),
-        ),
-        Marker(
-          markerId: MarkerId("garrick_theatre"),
-          position: LatLng(51.510145, -0.127708), 
-          infoWindow: InfoWindow(title: "Garrick Theatre"),
-        ),
-        Marker(
-          markerId: MarkerId("duchess_theatre"),
-          position: LatLng(51.512206, -0.119390), 
-          infoWindow: InfoWindow(title: "Duchess Theatre"),
-        ),
-        Marker(
-          markerId: MarkerId("prince_of_wales_theatre"),
-          position: LatLng(51.510067, -0.132714), 
-          infoWindow: InfoWindow(title: "Prince of Wales Theatre"),
-        ),
-        Marker(
-          markerId: MarkerId("savoy_theatre"),
-          position: LatLng(51.510372, -0.120919), 
-          infoWindow: InfoWindow(title: "Savoy Theatre"),
-        ),
-        
-      ]);
-    });
-  }
+  // void _loadTheatreMarkers() {
+  //   setState(() {
+  //     _markers.addAll([
+  //     ]);
+  //   });
+  // }
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
