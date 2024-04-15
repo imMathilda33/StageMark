@@ -17,7 +17,6 @@ class Event extends StatefulWidget {
 }
 
 class _EventState extends State<Event> {
-  final TextEditingController _searchController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _dateTimeController = TextEditingController();
   final TextEditingController _seatController = TextEditingController();
@@ -130,7 +129,6 @@ class _EventState extends State<Event> {
     User? currentUser = FirebaseAuth.instance.currentUser;
 
     if (currentUser != null) {
-      String search = _searchController.text;
       String name = _nameController.text;
       String dateTime = _dateTimeController.text;
       String seat = _seatController.text;
@@ -150,7 +148,6 @@ class _EventState extends State<Event> {
         // Construct the data to be saved
         Map<String, dynamic> eventData = {
           'userId': currentUser.uid,
-          'search': search,
           'name': name,
           'dateTime': dateTime,
           'seat': seat,
@@ -223,15 +220,6 @@ class _EventState extends State<Event> {
         padding: EdgeInsets.all(16.0),
         child: ListView(
           children: <Widget>[
-            TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Search',
-                prefixIcon: Icon(Icons.search),
-              ),
-            ),
-            SizedBox(height: 16.0),
             Text('Or enter manually:', style: TextStyle(fontSize: 16)),
             SizedBox(height: 16.0),
             TextField(
@@ -318,7 +306,6 @@ class _EventState extends State<Event> {
 
   @override
   void dispose() {
-    _searchController.dispose();
     _nameController.dispose();
     _dateTimeController.dispose();
     _seatController.dispose();
