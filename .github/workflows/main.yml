@@ -43,12 +43,12 @@ jobs:
       - name: Check if tag exists
         id: check_tag
         run: |
-          echo "CHECKING TAG v${{ env.TAG_VERSION }}"
-          TAG_EXISTS=$(git ls-remote --tags origin refs/tags/v${{ env.TAG_VERSION }} | wc -l)
-          if [ "$TAG_EXISTS" -eq "0" ]; then
-            echo "TAG_DOES_NOT_EXIST=true" >> $GITHUB_ENV
+          if git ls-remote --tags origin refs/tags/v${{ env.TAG_VERSION }} | grep 'refs/tags/v${{ env.TAG_VERSION }}'; then
+            echo "TAG_EXISTS=true" >> $GITHUB_ENV
           else
-            echo "TAG_DOES_NOT_EXIST=false" >> $GITHUB_ENV
+            echo "TAG_EXISTS=false" >> $GITHUB_ENV
+          fi
+      
       
       - name: Create and push new tag if it doesn't exist
         if: env.TAG_DOES_NOT_EXIST == 'true'
