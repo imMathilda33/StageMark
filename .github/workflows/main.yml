@@ -24,9 +24,10 @@ jobs:
         uses: mikefarah/yq@v4.42.1
 
       - name: Get pubspec version
+        id: get_flutter_app_version
         run: |
-          VERSION=$(yq e .version pubspec.yaml | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1)
-          echo "TAG_VERSION=$VERSION" >> $GITHUB_ENV
+          VERSION=$(yq .version | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' pubspec.yaml | head -n 1)
+          echo "TAG_VERSION=$VERSION" >> $GITHUB_OUTPUT
       
       - name: Check if git tag exists and increment version if necessary
         run: |
