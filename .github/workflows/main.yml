@@ -1,90 +1,63 @@
 name: Flutter Build and Upload Android APK
 
 on:
-  push:                 # This is the condition that the action will run on
-    branches: [ main ]  # In this case when you push your code into GitHub
-    # tags:
-    # - "v*.*.*"          # In this case when you tag your commit with v1.0.0 for example
+  push:
+    branches: [ main ]
 
 jobs:
   build:
-    runs-on: ubuntu-latest  # This is the type of machine we want to run the action on
+    runs-on: ubuntu-latest
     permissions:
       contents: write
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3     # Checkout the Repository on the Virtual Machine
+        uses: actions/checkout@v3
 
-      - name: Set up JDK              # Setup JAVA to build the Android APK for us
+      - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           java-version: '11'
           distribution: microsoft
 
-      #  Decode keystore File from repository secrets
-      #  Keep the keystore file private; don’t check it into public source control!
-      
-      #- name: Decode KeyStore File (.jks)            
-      #  run: echo "${{ secrets.KEYSTORE_JKS_PROD }}" | base64 --decode > android/keystore.jks
-
-      #- name: Decode android/key.properties
-      #  run: echo "${{ secrets.KEY_PROPERTIES_PROD }}" | base64 --decode > android/key.properties
-    
       - name: Install yq
         uses: mikefarah/yq@v4.42.1
 
-      - name: Generate timestamp
-        id: timestamp
-        run: echo "TIMESTAMP=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
-      
-      - name: Create and push new timestamped tag
+      - name: Get pubspec version
+        id: get_flutter_app_version
         run: |
-          NEW_TAG="v${{ env.TAG_VERSION }}-${{ env.TIMESTAMP }}"
-          git tag $NEW_TAG
-          git push origin $NEW_TAG
-        if: env.TAG_EXISTS == 'false'
+          VERSION=$(yq e .version pubspec.yaml | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1)
+          echo "TAG_VERSION=$VERSION" >> $GITHUB_ENV
       
-      # - name: Get pubspec version
-      #   id: get_flutter_app_version
-      #   run: |
-      #     VERSION=$(yq e '.version' pubspec.yaml | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+')
-      #     echo "TAG_VERSION=$VERSION" >> $GITHUB_ENV
-      
-      # - name: Check if tag exists
-      #   id: check_tag
-      #   run: |
-      #     if git ls-remote --tags origin refs/tags/v${{ env.TAG_VERSION }} | grep 'refs/tags/v${{ env.TAG_VERSION }}'; then
-      #       echo "TAG_EXISTS=true" >> $GITHUB_ENV
-      #     else
-      #       echo "TAG_EXISTS=false" >> $GITHUB_ENV
-      #     fi
-      
-      
-      # - name: Create and push new tag if it doesn't exist
-      #   if: env.TAG_DOES_NOT_EXIST == 'true'
-      #   run: |
-      #     git config --global user.email "you@example.com"
-      #     git config --global user.name "Your Name"
-      #     git tag v${{ env.TAG_VERSION }}
-      #     git push origin v${{ env.TAG_VERSION }}
-      
-          
+      - name: Check if git tag exists and increment version if necessary
+        id: check_and_increment_tag
+        run: |
+          TAG_VERSION=${{ env.TAG_VERSION }}
+          TAG_EXISTS=$(git ls-remote --tags origin refs/tags/v$TAG_VERSION)
+          while [[ "$TAG_EXISTS" != "" ]]; do
+            VERSION_ARRAY=(${TAG_VERSION//./ })
+            VERSION_ARRAY[2]=$((${VERSION_ARRAY[2]}+1))
+            NEW_VERSION="${VERSION_ARRAY[0]}.${VERSION_ARRAY[1]}.${VERSION_ARRAY[2]}"
+            TAG_EXISTS=$(git ls-remote --tags origin refs/tags/v$NEW_VERSION)
+            echo "TAG_EXISTS for v$NEW_VERSION is $TAG_EXISTS"
+          done
+          echo "NEW_TAG_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+          echo "TAG_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+          echo "::set-output name=version::$NEW_VERSION"
 
-        
+      
+      - name: Create git tag
+        run: |
+          git tag "v${{ steps.check_and_increment_tag.outputs.version }}"
+          git push origin "v${{ steps.check_and_increment_tag.outputs.version }}"
 
-      - name: Install Flutter               # Install Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: 'main'
-
-      - name: Get Flutter dependencies      # Get the Libraries and Dependencies
+      - name: Get Flutter dependencies
         run: flutter pub get
 
-      - name: Build APK Release             # Build a release
+      - name: Build APK Release
         run: flutter build apk --release
 
-      - name: Build an AppBundle            # App Bundles are useful for Google Play Store
+      - name: Build an AppBundle
         run: flutter build appbundle --release
 
       - name: Save APK to Artifacts
@@ -103,33 +76,4 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           artifacts: "build/app/outputs/bundle/release/*.aab,build/app/outputs/flutter-apk/*.apk"
-          tag: "v${{ steps.get_flutter_app_version.outputs.TAG_VERSION }}"
-          # token: ${{ secrets.PERSONAL_RELEASE_TOKEN }}
-
-  # TODO:  Upload to Firebase - for App Distribution
-  # Release job, upload the apk or aab to Firebase App Distribution
-  # release:
-  #   name: Sends Release APK to Firebase
-  #   needs: [ build ]
-  #   runs-on: ubuntu-latest
-  #   steps:
-    
-  #   # Retrieve apk file from GitHub artifacts
-  #   - uses: actions/checkout@v3
-  #   - name: Get flutter-apk from artifacts
-  #     uses: actions/download-artifact@v3
-  #     with:
-  #       name: flutter-apk
-  #  OR
-  #       name: flutter-appbundle
-
-  #   # Upload apk file to Firebase
-  #   - name: Upload artifact to Firebase App Distribution
-  #     uses: wzieba/Firebase-Distribution-Github-Action@v1
-  #     with:
-  #       appId: ${{secrets.FIREBASE_IOS_APP_ID}}
-  #       serviceCredentialsFileContent: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
-  #       groups: android-developers
-  #       file: ${{secrets.APP_NAME}}.apk
-  #  OR
-  #       file: ${{secrets.APP_NAME}}.aab
+          tag: "v${{ steps.check_and_increment_tag.outputs.version }}"
