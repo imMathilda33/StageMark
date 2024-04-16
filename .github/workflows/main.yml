@@ -38,26 +38,25 @@ jobs:
         id: get_flutter_app_version
         run: |
           VERSION=$(yq e '.version' pubspec.yaml | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+')
+          echo "Version extracted is $VERSION"
           echo "TAG_VERSION=$VERSION" >> $GITHUB_ENV
       
       - name: Check if tag exists
         id: check_tag
         run: |
-          if git ls-remote --tags origin refs/tags/v${{ env.TAG_VERSION }} | grep 'refs/tags/v${{ env.TAG_VERSION }}'; then
+          if git ls-remote --tags origin refs/tags/v${{ env.TAG_VERSION }}; then
             echo "TAG_EXISTS=true" >> $GITHUB_ENV
           else
             echo "TAG_EXISTS=false" >> $GITHUB_ENV
           fi
-      
-      
+        
       - name: Create and push new tag if it doesn't exist
-        if: env.TAG_DOES_NOT_EXIST == 'true'
+        if: env.TAG_EXISTS == 'false'
         run: |
           git config --global user.email "you@example.com"
           git config --global user.name "Your Name"
           git tag v${{ env.TAG_VERSION }}
           git push origin v${{ env.TAG_VERSION }}
-      
           
 
         
