@@ -49,11 +49,14 @@ jobs:
             echo "TAG_EXISTS=false" >> $GITHUB_OUTPUT
           fi
         
+        
       - name: Create git tag
         if: steps.check_tag.outputs.TAG_EXISTS == 'false'
         run: |
           git tag "v${{ steps.get_flutter_app_version.outputs.TAG_VERSION }}"
           git push origin "v${{ steps.get_flutter_app_version.outputs.TAG_VERSION }}"
+        
+
         
 
       - name: Install Flutter               # Install Flutter
