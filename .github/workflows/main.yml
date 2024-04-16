@@ -40,8 +40,6 @@ jobs:
       
       - name: Create and push new timestamped tag
         run: |
-          git config --global user.email "you@example.com"
-          git config --global user.name "Your Name"
           NEW_TAG="v${{ env.TAG_VERSION }}-${{ env.TIMESTAMP }}"
           git tag $NEW_TAG
           git push origin $NEW_TAG
