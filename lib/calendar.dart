@@ -34,7 +34,7 @@ class _CalendarState extends State<Calendar> {
     _fetchAllEvents();
   }
 
-  void _fetchAllEvents() async {
+  Future<void> _fetchAllEvents() async {
     User? currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser != null) {
       DatabaseReference ref =
@@ -82,9 +82,6 @@ class _CalendarState extends State<Calendar> {
   }
 
 
-void onEventDeleted() {
-  _fetchAllEvents();
-}
   @override
   Widget build(BuildContext context) {
     User? currentUser = FirebaseAuth.instance.currentUser;
@@ -179,99 +176,105 @@ void onEventDeleted() {
             },
           ),
           Expanded(
-            child: _selectedDayEvents.length > 0
-                ? ListView.builder(
-                    itemCount: _selectedDayEvents.length,
-                    itemBuilder: (context, index) {
-                      final event = _selectedDayEvents[index];
-                      return Card(
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: 12.0, vertical: 6.0),
-                        elevation: 4.0,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.0)),
-                        color: Color.fromRGBO(
-                            255, 218, 205, 1), // Set the card color
-                        child: ListTile(
-                          onTap: () {
-                            // Use Navigator.push to jump to the EventDetailPage and pass the clicked event
-                            Navigator.of(context)
-                                .push(
-                              MaterialPageRoute(
-                                builder: (context) => EventDetailPage(
-                                  selectedDayEvent: _selectedDayEvents,
-                                  index: index,
-                                  eventId: event['eventId'],
-                                  onEventDeleted: onEventDeleted,
-                                ),
-                              ),
-                            )
-                                .then((_) {
-                              // Refresh the event when returning from the EventDetailPage
-                              _fetchAllEvents();
-                            });
-                          },
-                          contentPadding: EdgeInsets.symmetric(
-                              horizontal: 16.0, vertical: 10.0),
-                          title: Text(
-                            event['name'],
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18.0,
-                              color: Colors.grey[800],
-                            ),
-                          ),
-                          subtitle: Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Date & Time: ${event['dateTime']}',
-                                  style: TextStyle(
-                                      fontSize: 14.0, color: Colors.grey[800]),
-                                ),
-                                SizedBox(height: 4.0),
-                                Text(
-                                  'Seat: ${event['seat']}',
-                                  style: TextStyle(
-                                      fontSize: 14.0, color: Colors.grey[800]),
-                                ),
-                                SizedBox(height: 4.0),
-                                Text(
-                                  'Theatre: ${event['theatre']}',
-                                  style: TextStyle(
-                                      fontSize: 14.0, color: Colors.grey[800]),
-                                ),
-                              ],
-                            ),
-                          ),
-                          trailing: event['imageUrl'] != null
-                              ? ClipRRect(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  child: Image.network(
-                                    event['imageUrl'],
-                                    width: 50,
-                                    height: 50,
-                                    fit: BoxFit.cover,
+            child: RefreshIndicator(
+              onRefresh: _fetchAllEvents,
+              child: _selectedDayEvents.length > 0
+                  ? ListView.builder(
+                      itemCount: _selectedDayEvents.length,
+                      itemBuilder: (context, index) {
+                        final event = _selectedDayEvents[index];
+                        return Card(
+                          margin: const EdgeInsets.symmetric(
+                              horizontal: 12.0, vertical: 6.0),
+                          elevation: 4.0,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.0)),
+                          color: Color.fromRGBO(
+                              255, 218, 205, 1), // Set the card color
+                          child: ListTile(
+                            onTap: () {
+                              // Use Navigator.push to jump to the EventDetailPage and pass the clicked event
+                              Navigator.of(context)
+                                  .push(
+                                MaterialPageRoute(
+                                  builder: (context) => EventDetailPage(
+                                    selectedDayEvent: _selectedDayEvents,
+                                    index: index,
+                                    eventId: event['eventId'],
                                   ),
-                                )
-                              : SizedBox(width: 50, height: 50),
-                        ),
-                      );
-                    },
-                  )
-                : (currentUser != null
-                    ? Text(
-                        'No Event Found,\nHave a Good Day!',
-                        style:
-                            TextStyle(fontSize: 20.0, color: Colors.grey[800]),
-                      )
-                    : Text(
-                        'Please log in to start',
-                        style:
-                            TextStyle(fontSize: 20.0, color: Colors.grey[800]),
-                      )),
+                                ),
+                              )
+                                  .then((_) {
+                                // Refresh the event when returning from the EventDetailPage
+                                _fetchEventsForSelectedDay();
+                                _fetchAllEvents();
+                              });
+                            },
+                            contentPadding: EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 10.0),
+                            title: Text(
+                              event['name'],
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18.0,
+                                color: Colors.grey[800],
+                              ),
+                            ),
+                            subtitle: Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Date & Time: ${event['dateTime']}',
+                                    style: TextStyle(
+                                        fontSize: 14.0,
+                                        color: Colors.grey[800]),
+                                  ),
+                                  SizedBox(height: 4.0),
+                                  Text(
+                                    'Seat: ${event['seat']}',
+                                    style: TextStyle(
+                                        fontSize: 14.0,
+                                        color: Colors.grey[800]),
+                                  ),
+                                  SizedBox(height: 4.0),
+                                  Text(
+                                    'Theatre: ${event['theatre']}',
+                                    style: TextStyle(
+                                        fontSize: 14.0,
+                                        color: Colors.grey[800]),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            trailing: event['imageUrl'] != null
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    child: Image.network(
+                                      event['imageUrl'],
+                                      width: 50,
+                                      height: 50,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  )
+                                : SizedBox(width: 50, height: 50),
+                          ),
+                        );
+                      },
+                    )
+                  : (currentUser != null
+                      ? Text(
+                          'No Event Found,\nHave a Good Day!',
+                          style: TextStyle(
+                              fontSize: 20.0, color: Colors.grey[800]),
+                        )
+                      : Text(
+                          'Please log in to start',
+                          style: TextStyle(
+                              fontSize: 20.0, color: Colors.grey[800]),
+                        )),
+            ),
           ),
         ],
       ),

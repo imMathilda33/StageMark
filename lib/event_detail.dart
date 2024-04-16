@@ -7,14 +7,12 @@ class EventDetailPage extends StatefulWidget {
   List<dynamic> selectedDayEvent;
   int index;
   final String eventId;
-  final Function onEventDeleted;
 
   EventDetailPage({
     Key? key,
     required this.selectedDayEvent,
     required this.index,
     required this.eventId,
-    required this.onEventDeleted,
   }) : super(key: key);
 
   @override
@@ -51,7 +49,6 @@ class _EventDetailPageState extends State<EventDetailPage> {
           'users/${FirebaseAuth.instance.currentUser!.uid}/events/$eventId');
       await eventRef.remove().then((_) {
         Navigator.of(context).pop(); 
-        widget.onEventDeleted(); 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text("Event deleted successfully"),
