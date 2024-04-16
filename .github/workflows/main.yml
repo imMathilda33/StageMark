@@ -23,17 +23,12 @@ jobs:
       - name: Install yq
         uses: mikefarah/yq@v4.42.1
 
-
-      - name: Get pubspec version
-        id: get_flutter_app_version
+      - name: Get pubspec version and check git tag
+        id: get_flutter_app_version_and_check_tag
         run: |
           VERSION=$(yq e .version pubspec.yaml | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1)
           echo "ORIGINAL_TAG_VERSION=$VERSION" >> $GITHUB_ENV
           echo "TAG_VERSION=$VERSION" >> $GITHUB_ENV
-
-      - name: Check if git tag exists and update version if needed
-        id: check_and_update_tag
-        run: |
           if git rev-parse "v${{ env.TAG_VERSION }}" >/dev/null 2>&1; then
             # Extract major, minor, and patch versions
             IFS='.' read -ra ADDR <<< "${{ env.TAG_VERSION }}"
@@ -45,23 +40,13 @@ jobs:
           else
             echo "::set-output name=tag_updated::false"
             echo "Tag v${{ env.TAG_VERSION }} does not exist. Proceeding with original version."
-          fi
 
       - name: Create and push new git tag
-        if: steps.check_and_update_tag.outputs.tag_updated == 'true'
+        if: steps.get_flutter_app_version_and_check_tag.outputs.tag_updated == 'true'
         run: |
           git tag "v${{ env.TAG_VERSION }}"
           git push origin "v${{ env.TAG_VERSION }}"
           echo "New tag v${{ env.TAG_VERSION }} created and pushed."
-
-      - name: Create git tag if not exists
-        if: steps.check_and_update_tag.outputs.tag_updated == 'false'
-        run: |
-          git tag "v${{ env.TAG_VERSION }}"
-          git push origin "v${{ env.TAG_VERSION }}"
-          echo "Tag v${{ env.TAG_VERSION }} created and pushed."
-
-
 
       - name: Install Flutter
         uses: subosito/flutter-action@v2
@@ -94,7 +79,4 @@ jobs:
         with:
           artifacts: "build/app/outputs/bundle/release/*.aab,build/app/outputs/flutter-apk/*.apk"
           tag: "v${{ env.TAG_VERSION }}"
-          # token: ${{ secrets.PERSONAL_RELEASE_TOKEN }}
-        if: steps.check_tag.outputs.exists == 'false'
-
-
+          if: steps.get_flutter_app_version_and_check_tag.outputs.tag_updated == 'false'
