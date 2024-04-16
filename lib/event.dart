@@ -220,7 +220,7 @@ class _EventState extends State<Event> {
         padding: EdgeInsets.all(16.0),
         child: ListView(
           children: <Widget>[
-            Text('Or enter manually:', style: TextStyle(fontSize: 16)),
+            Text('Please enter your event details:', style: TextStyle(fontSize: 16)),
             SizedBox(height: 16.0),
             TextField(
               controller: _nameController,
