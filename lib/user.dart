@@ -25,6 +25,7 @@ class _UserPageState extends State<UserPage> {
         child: Column(
           children: <Widget>[
             SizedBox(height: 20),
+            // the avatar
             CircleAvatar(
               radius: 50,
               backgroundImage: user?.photoURL != null
@@ -32,9 +33,11 @@ class _UserPageState extends State<UserPage> {
                   : AssetImage('lib/img/logo.png') as ImageProvider,
             ),
             SizedBox(height: 10),
+            //user name
             Text(user?.displayName ?? user?.email ?? 'User Nickname',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             SizedBox(height: 20),
+            // update button
             ElevatedButton(
               onPressed: () => updateProfile(),
               child: Text('Edit Photo'),
@@ -71,17 +74,17 @@ class _UserPageState extends State<UserPage> {
     if (image != null) {
       File file = File(image.path);
       try {
-        // 上传图片到 Firebase Storage
+        // Upload images to Firebase Storage
         String filePath =
             'user_profiles/${user!.uid}/${DateTime.now().millisecondsSinceEpoch}.png';
         TaskSnapshot taskSnapshot =
             await FirebaseStorage.instance.ref(filePath).putFile(file);
 
-        // 获取图片 URL 并更新用户资料
+       // Get the image URL and update the user profile
         String photoURL = await taskSnapshot.ref.getDownloadURL();
         await user!.updatePhotoURL(photoURL);
 
-        // 刷新页面以显示新头像
+        // Refresh the page to show the new avatar
         setState(() {
           user = FirebaseAuth.instance.currentUser;
         });
@@ -91,6 +94,7 @@ class _UserPageState extends State<UserPage> {
     }
   }
 
+// show the dialog to edit userName
   void showEditUsernameDialog(BuildContext context) {
     print("Attempting to show edit username dialog.");
     showDialog(

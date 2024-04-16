@@ -104,7 +104,7 @@ class _EventState extends State<Event> {
       );
 
       if (pickedTime != null) {
-       // Combine the date and time into a DateTime object.
+        // Combine the date and time into a DateTime object.
         DateTime finalDateTime = DateTime(
           pickedDate.year,
           pickedDate.month,
@@ -117,7 +117,7 @@ class _EventState extends State<Event> {
         String formattedDateTime =
             DateFormat('yyyy-MM-dd HH:mm:ss').format(finalDateTime);
 
-       // Update the status to show in the UI
+        // Update the status to show in the UI
         setState(() {
           _dateTimeController.text = formattedDateTime;
         });
@@ -159,12 +159,17 @@ class _EventState extends State<Event> {
           eventData['imageUrl'] = imageUrl;
         }
 
-        // save to Realtime Database
-        DatabaseReference databaseReference = FirebaseDatabase.instance.ref();
-        await databaseReference
-            .child('users/${currentUser.uid}/events')
-            .push()
-            .set(eventData);
+        // save to Realtime Database and get the auto-generated event ID
+        DatabaseReference eventRef = FirebaseDatabase.instance
+            .ref('users/${currentUser.uid}/events')
+            .push();
+        await eventRef.set(eventData);
+
+        // Here we can access the auto-generated event ID
+        String eventId = eventRef.key!;
+
+        // Optionally, if you want to add the eventId to your eventData
+        await eventRef.update({'eventId': eventId});
 
         // Reset reminder status after successful submission
         setState(() {
@@ -220,7 +225,8 @@ class _EventState extends State<Event> {
         padding: EdgeInsets.all(16.0),
         child: ListView(
           children: <Widget>[
-            Text('Please enter your event details:', style: TextStyle(fontSize: 16)),
+            Text('Please enter your event details:',
+                style: TextStyle(fontSize: 16)),
             SizedBox(height: 16.0),
             TextField(
               controller: _nameController,
@@ -237,8 +243,8 @@ class _EventState extends State<Event> {
                 labelText: 'Date & Time',
                 hintText: 'Select Date and Time',
               ),
-              readOnly: true, 
-              onTap: _pickDateTime, 
+              readOnly: true,
+              onTap: _pickDateTime,
             ),
             SizedBox(height: 16.0),
             TextField(
@@ -267,7 +273,7 @@ class _EventState extends State<Event> {
                 : Center(
                     child: Text(
                     "No image selected",
-                    style: TextStyle(color:  Color.fromARGB(255, 117, 104, 117)),
+                    style: TextStyle(color: Color.fromARGB(255, 117, 104, 117)),
                   )),
             SizedBox(height: 16.0),
             if (_isFieldEmpty)
@@ -275,7 +281,7 @@ class _EventState extends State<Event> {
                 padding: const EdgeInsets.only(bottom: 8.0),
                 child: Text(
                   'Please fill in all fields',
-                  style: TextStyle(color:  Colors.red),
+                  style: TextStyle(color: Colors.red),
                   textAlign: TextAlign.center,
                 ),
               ),
