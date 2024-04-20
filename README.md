@@ -6,11 +6,7 @@ StageMark is a Flutter-based application designed for theatre lovers. StageMark 
 
 ## Features
 
-### 🌐 Connected Environment Integration
-- **Venue Directions:** Utilize integrated google-map for navigation to your next theatre destination.
-- **Ambient Sound Check:** Employ the noise detection feature to measure your physical environment, ideal for outdoor or unique performance spaces.
-- 
-![alt text](lib/img/2.jpg)
+
 
 ### 🗓 Calendar Management
 - **Personalized Stage List:** Effortlessly add and manage your anticipated theatre and performance events.
@@ -18,6 +14,11 @@ StageMark is a Flutter-based application designed for theatre lovers. StageMark 
 
 ![alt text](lib/img/1.jpg)
 
+### 🌐 Connected Environment Integration
+- **Venue Directions:** Utilize integrated google-map for navigation to your next theatre destination.
+- **Ambient Sound Check:** Employ the noise detection feature to measure your physical environment, ideal for outdoor or unique performance spaces.
+
+![alt text](lib/img/2.jpg)
 
 ### :hammer_and_pick: How To Install The App
 
