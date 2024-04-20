@@ -23,7 +23,7 @@ StageMark is a Flutter-based application crafted for theater lovers. StageMark i
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/stagemark.git
+   git clone https://github.com/imMathilda33/StageMark.git
    ```
 
 2. Change directory to the project folder:
@@ -44,9 +44,8 @@ StageMark is a Flutter-based application crafted for theater lovers. StageMark i
 
 
 
-### Contact me
+### :thought_balloon: Contact me
 - Feel free to contact me at: mathilda332023@outlook.com
-
 
 <!-- 
 ## Use this README File 
