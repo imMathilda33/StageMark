@@ -1,25 +1,23 @@
 # StageMark - Your Theater Companion
 
-StageMark is a Flutter-based application crafted for theater lovers. StageMark is your personal assistant for managing your future theater visits, musical evenings, and captivating performances, all within an elegantly designed calendar interface. Experience the harmony of your digital planning with the physical realm through our unique environment-connected features.
+StageMark is a Flutter-based application designed for theatre lovers. StageMark is your personal assistant for managing your future theatre visits, musical evenings, and captivating performances, all within an elegant calendar interface. Experience an incredibly enjoyable journey through the theatre with our unique environment-connected feature.
+
+![alt text](lib/img/1.jpg)
 
 ## Features
 
-### 🗓 Calendar Management
-- **Personalized Stage List:** Effortlessly add and manage your anticipated theater and performance events.
-- **Event Insights:** Delve into comprehensive details about each event, including showtimes, venue information, and synopses.
-- **Alerts & Notifications:** Set reminders to ensure you're always in the loop and never miss a curtain call.
-
 ### 🌐 Connected Environment Integration
 - **Venue Directions:** Utilize integrated google-map for navigation to your next theatre destination.
-- **Ambient Sound Check:** Employ the noise detection feature to optimize your viewing environment, ideal for outdoor or unique performance spaces.
+- **Ambient Sound Check:** Employ the noise detection feature to measure your physical environment, ideal for outdoor or unique performance spaces.
 
-### 📱 Intuitive User Experience
-- **Streamlined Interface:** Navigate through a modern and user-friendly interface designed for efficiency and elegance.
-- **Simplified Event Management:** Modify, remove, or reschedule your planned events with ease.
+### 🗓 Calendar Management
+- **Personalized Stage List:** Effortlessly add and manage your anticipated theatre and performance events.
+- **Event Insights:** Delve into comprehensive details about each event, including showtimes, seat information, and some photos from the scene!
 
 
 
-### How To Install The App
+
+### :hammer_and_pick: How To Install The App
 
 1. Clone the repository:
    ```
@@ -47,8 +45,4 @@ StageMark is a Flutter-based application crafted for theater lovers. StageMark i
 ### :thought_balloon: Contact me
 - Feel free to contact me at: mathilda332023@outlook.com
 
-<!-- 
-## Use this README File 
-
-Use this section to show us what your Mobile App is about.   Include a Screenshot to the App, link to the various frameworks you've used. Include your presentation video here that shows off your Mobile App.   Emojis are also fun to include 📱 😄 -->
 
