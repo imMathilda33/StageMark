@@ -18,7 +18,8 @@ class _CalendarState extends State<Calendar> {
   DateTime? _selectedDay;
   List<dynamic> _selectedDayEvents = [];
 
-  void _showAllEvents() {
+  void _showAllEvents() async {
+    await _fetchAllEvents(); 
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => EventsListPage(allEvents: allEvents),
