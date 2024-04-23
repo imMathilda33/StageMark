@@ -3,9 +3,8 @@
 StageMark is a Flutter-based application designed for theatre lovers. StageMark is your personal assistant for managing your future theatre visits, musical evenings, and captivating performances, all within an elegant calendar interface. Experience an incredibly enjoyable journey through the theatre with our unique environment-connected feature.
 
 ### Landing Page
-https://immathilda33.github.io/
+https://immathilda33.github.io/StageMark/
 
-source code: https://github.com/imMathilda33/imMathilda33.github.io
 
 ## Features
 
