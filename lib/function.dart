@@ -29,6 +29,7 @@ class _FunctionPageState extends State<FunctionPage> {
     _markers.addAll(loadTheatreMarkers());
   }
 
+// initialize sound recorder
   Future<void> _initializeRecorder() async {
     _recorder = FlutterSoundRecorder();
 
@@ -88,6 +89,7 @@ class _FunctionPageState extends State<FunctionPage> {
     }
   }
 
+// fetch nearby locations
   Future<void> _fetchNearbyTheaters(LatLng currentPosition) async {
     const apiKey = 'AIzaSyAdTknHEdeDrUvMahgZawQo2JwmpafovPo';
     final String url =
@@ -102,6 +104,7 @@ class _FunctionPageState extends State<FunctionPage> {
     }
   }
 
+// add locations to markers 
   void _updateMarkers(List<dynamic> theaters) {
     setState(() {
       _markers.clear();
@@ -120,12 +123,6 @@ class _FunctionPageState extends State<FunctionPage> {
     });
   }
 
-  // void _loadTheatreMarkers() {
-  //   setState(() {
-  //     _markers.addAll([
-  //     ]);
-  //   });
-  // }
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;

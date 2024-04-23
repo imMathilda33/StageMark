@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
         splashFactory: NoSplash.splashFactory,
         highlightColor: Colors.transparent,
       ),
-      title: 'Your App Name',
+      title: 'StageMark',
       home: MyTabbedPage(),
     );
   }

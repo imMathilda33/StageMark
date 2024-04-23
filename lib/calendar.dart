@@ -35,6 +35,8 @@ class _CalendarState extends State<Calendar> {
     _fetchAllEvents();
   }
 
+
+// get all events from the database
   Future<void> _fetchAllEvents() async {
     User? currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser != null) {
@@ -57,7 +59,7 @@ class _CalendarState extends State<Calendar> {
     }
   }
 
-// fetch the event user has added for the specific
+// fetch the event user has added for the specific day
   void _fetchEventsForSelectedDay() async {
     User? currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser != null && _selectedDay != null) {
@@ -114,6 +116,8 @@ class _CalendarState extends State<Calendar> {
                 _fetchEventsForSelectedDay();
               });
             },
+
+            // the calendar
             calendarBuilders: CalendarBuilders(
               markerBuilder: (context, date, events) {
                 if (allEvents[date] != null && allEvents[date]!.isNotEmpty) {
@@ -177,6 +181,7 @@ class _CalendarState extends State<Calendar> {
             },
           ),
           Expanded(
+            // show all events
             child: RefreshIndicator(
               onRefresh: _fetchAllEvents,
               child: _selectedDayEvents.length > 0
@@ -283,6 +288,8 @@ class _CalendarState extends State<Calendar> {
   }
 }
 
+
+// event styles
 Widget _buildEventsMarker(DateTime date, List events) {
   return AnimatedContainer(
     duration: const Duration(milliseconds: 300),

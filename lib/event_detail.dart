@@ -20,6 +20,7 @@ class EventDetailPage extends StatefulWidget {
 }
 
 class _EventDetailPageState extends State<EventDetailPage> {
+  // handling deletion of events
   void _deleteEvent(String eventId) async {
     // Confirm the deletion
     bool confirmDelete = await showDialog(
@@ -30,25 +31,25 @@ class _EventDetailPageState extends State<EventDetailPage> {
               content: Text('Are you sure you want to delete this event?'),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.of(context).pop(false), 
+                  onPressed: () => Navigator.of(context).pop(false),
                   child: Text('Cancel'),
                 ),
                 TextButton(
-                  onPressed: () => Navigator.of(context).pop(true), 
+                  onPressed: () => Navigator.of(context).pop(true),
                   child: Text('Delete'),
                 ),
               ],
             );
           },
         ) ??
-        false; 
+        false;
 
     // If the user confirms the deletion
     if (confirmDelete) {
       DatabaseReference eventRef = FirebaseDatabase.instance.ref(
           'users/${FirebaseAuth.instance.currentUser!.uid}/events/$eventId');
       await eventRef.remove().then((_) {
-        Navigator.of(context).pop(); 
+        Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text("Event deleted successfully"),
@@ -66,6 +67,8 @@ class _EventDetailPageState extends State<EventDetailPage> {
     }
   }
 
+
+// show event details
   @override
   Widget build(BuildContext context) {
     String eventId = widget.selectedDayEvent[widget.index]['eventId'];

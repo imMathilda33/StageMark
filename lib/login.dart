@@ -11,6 +11,8 @@ class LoginRegisterPage extends StatefulWidget {
   _LoginRegisterPageState createState() => _LoginRegisterPageState();
 }
 
+
+// handing interactions with firebase
 void saveInformation(String term, String? info) async {
   SharedPreferences dataBase = await SharedPreferences.getInstance();
   dataBase.setString(term, info!);
@@ -44,6 +46,8 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
   bool _isRegistering = false;
   bool _isRegisteringSuccess = false;
 
+
+//register function
   void _register() async {
     if (_isRegistering && passwordController.value == confirmationController.value && confirmationController.text != "") {
       try {
@@ -78,6 +82,8 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
     }
   }
 
+
+// login function
   void _login() async {
     if (!_isRegistering) {
       try {

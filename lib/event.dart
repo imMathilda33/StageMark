@@ -164,11 +164,7 @@ class _EventState extends State<Event> {
             .ref('users/${currentUser.uid}/events')
             .push();
         await eventRef.set(eventData);
-
-        // Here we can access the auto-generated event ID
         String eventId = eventRef.key!;
-
-        // Optionally, if you want to add the eventId to your eventData
         await eventRef.update({'eventId': eventId});
 
         // Reset reminder status after successful submission

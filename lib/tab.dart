@@ -33,6 +33,7 @@ class _MyTabbedPageState extends State<MyTabbedPage> with SingleTickerProviderSt
     super.dispose();
   }
 
+// if not logged in, switch to login page
   Widget _getTabContent() {
     return isLoggedIn ? UserPage(tabController: _tabController) : LoginRegisterPage(onLoginSuccess: () {
       setState(() {
