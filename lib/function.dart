@@ -131,7 +131,7 @@ class _FunctionPageState extends State<FunctionPage> {
 
   @override
   Widget build(BuildContext context) {
-    const int noiseThreshold = 70;
+    const int noiseThreshold = 50;
     Size size = MediaQuery.of(context).size;
 
     return Scaffold(
